@@ -4,6 +4,7 @@
   "description": "koa-controller",
   "main": "index.js",
   "scripts": {
+    "dev":"node ./example/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "wschat",

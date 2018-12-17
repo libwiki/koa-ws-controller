@@ -9,6 +9,10 @@ module.exports = class{
         if(!options.appPath){
             throw new TypeError('appPath is undefined');
         }
+        if(!path.isAbsolute(options.appPath))options.appPath=path.join(__dirname,options.appPath);
+        if(!h.isExist(options.appPath)){
+            throw new Error('Directory does not exist: '+options.appPath);
+        }
         this.options=Object.assign({
             appPath:'',
             [_keys[2]]:'home',
@@ -40,7 +44,7 @@ module.exports = class{
             if(!ctx.module)ctx.module=options.module;
             if(!ctx.controller)ctx.controller=options.controller;
             if(!ctx.action)ctx.action=options.action;
-            const modules=await this[parseModules]('./app').catch(err=>{throw err});
+            const modules=await this[parseModules](options.appPath).catch(err=>{throw err});
             let controllers=modules[ctx.module] || {};
             let C=controllers[ctx.controller];
             await next();

@@ -1,4 +1,5 @@
 const Koa=require('koa')
+const path=require('path')
 const Router=require('koa-router')
 const Controller=require('../index')
 const parseRoute=Controller.parseRoute
@@ -16,7 +17,7 @@ router2.get('/index',async (ctx,next)=>{
 router.use('/user',router2.routes())
 app.use(router.routes())
 app.use(router.allowedMethods())
-app.use(new Controller({appPath:'./app'}))
+app.use(new Controller({appPath:path.join(__dirname,'./app')}))
 app.use(async (ctx,next)=>{
     ctx.aaa='aaaaaaaaaaa'
     await next()
