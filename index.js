@@ -4,7 +4,7 @@ const runAction=Symbol('runAction')
 const runAction2=Symbol('runAction')
 const parseModules=Symbol('parseModules')
 const _keys=['action','controller','module'];
-class Controller{
+module.exports = class{
     constructor(options={}){
         if(!options.appPath){
             throw new TypeError('appPath is undefined');
@@ -145,17 +145,4 @@ class Controller{
 
     }
 }
-module.exports=Controller;
-// module.exports= new Proxy(Controller,{
-//     construct(target, args, receiver){
-//         const app= new Proxy(new Controller(...args),{
-//             get(target, key, receiver) {
-//                 if (!Reflect.get(target, key, receiver)) {
-//                     return Reflect.get(router, key, receiver)
-//                 }
-//                 return Reflect.get(target, key, receiver)
-//             },
-//         })
-//         return app;
-//     },
-// })
+
