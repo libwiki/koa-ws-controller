@@ -6,7 +6,7 @@ module.exports=class{
         console.log('__before')
     }
     async index(ctx){
-        console.log('home/index/index.html',ctx.controller,ctx.aaa)
+        console.log('home/index/index.html')
         ctx.body='home/index/index.html';
         return true;
     }
@@ -15,6 +15,6 @@ module.exports=class{
     }
     async __call(ctx){
         console.log('__call')
-        ctx.body='404';
+        ctx.body='not action';
     }
 }

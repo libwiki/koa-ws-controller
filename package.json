@@ -4,7 +4,8 @@
   "description": "koa-controller",
   "main": "index.js",
   "scripts": {
-    "dev":"node ./example/app.js",
+    "dev:auto": "node ./example/auto.js",
+    "dev:method": "node ./example/method.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "wschat",
@@ -13,8 +14,8 @@
     "ws-helpers": "^1.0.0"
   },
   "devDependencies": {
-    "koa-router": "^7.4.0",
-    "koa": "^2.6.2"
+    "koa": "^2.6.2",
+    "koa-router": "^7.4.0"
   },
   "keywords": [
     "koa-controller",
