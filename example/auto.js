@@ -2,7 +2,7 @@ const Koa=require('koa')
 const path=require('path')
 const Controller=require('../index')
 const app=new Koa();
-app.use(Controller.extname()) //去掉 ctx.path的伪静态后缀(必选并且该中间件应该在路由匹配之前)（例：/a/b.html）
+app.use(Controller.sliceSuffix()) //去掉 ctx.path的伪静态后缀(必选并且该中间件应该在路由匹配之前)（例：/a/b.html）
 app.use(new Controller({
     appPath:path.join(__dirname,'./app'), //模块目录路径 （必选）
     auto:true, //是否自动路由匹配 默认值：true （匹配所有方法 例：post、get......）

@@ -1,4 +1,5 @@
 const path=require('path')
+const defaultExtend = require('./extend')
 const h=require('ws-helpers')
 const runAction=Symbol('runAction')
 const parseModules=Symbol('parseModules')
@@ -12,13 +13,23 @@ module.exports = class Controller{
         if(!h.isExist(options.appPath)){
             throw new Error('Directory does not exist: '+options.appPath);
         }
+        // 加载用户扩展
+        if (options.extendPath){
+            if (!path.isAbsolute(options.extendPath)) options.extendPath = path.join(__dirname, options.extendPath);
+            if (!h.isExist(options.extendPath)) {
+                throw new Error('File does not exist: ' + options.extendPath);
+            }
+            this.userExtend = require(options.extendPath)
+        }
         this.options=Object.assign({
             appPath:'',
+            extendPath:null,
             auto:true,
             [_keys[0]]:'home',
             [_keys[1]]:'index',
             [_keys[2]]:'index',
         },options);
+
         return this[runAction]()
     }
     static autoMatch(ctx,pathStr){
@@ -43,7 +54,7 @@ module.exports = class Controller{
             await next();
         }
     }
-    static extname(){
+    static sliceSuffix(){
         return async (ctx,next)=>{
             let extlength=path.extname(ctx.path).length;
             if(extlength)ctx.path=ctx.path.slice(0,ctx.path.length-extlength);
@@ -63,6 +74,14 @@ module.exports = class Controller{
             let controllers=modules[ctx.module] || {};
             let C=controllers[ctx.controller];
             if(!C) return Promise.resolve();
+            let userExtend = this.userExtend || {};
+            if (typeof userExtend==='function'){
+                userExtend = userExtend(ctx);
+            }
+            let extendObject = Object.assign({}, defaultExtend(ctx), userExtend)
+            for (let i in extendObject){
+                C.prototype[i] = extendObject[i];
+            }
             let instance=new C(ctx),
                 promise=Promise.resolve();
             if (instance.__before) {
