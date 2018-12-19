@@ -21,15 +21,23 @@ module.exports = class Controller{
             }
             this.userExtend = require(options.extendPath)
         }
+        if (options.excludeModule&&!Array.isArray(options.excludeModule)) {
+            options.excludeModule = [options.excludeModule]
+        }
+        if (options.excludeController && !Array.isArray(options.excludeController)) {
+            options.excludeController = [options.excludeController]
+        }
         this.options=Object.assign({
             appPath:'',
             extendPath:null,
             auto:true,
+            excludeModule:['common'],
+            excludeController: ['common'],
             [_keys[0]]:'home',
             [_keys[1]]:'index',
             [_keys[2]]:'index',
         },options);
-
+        
         return this[runAction]()
     }
     static autoMatch(ctx,pathStr){
@@ -48,7 +56,7 @@ module.exports = class Controller{
             //console.log('autoMatch:',ctx.module,ctx.controller,ctx.action)
         }
     }
-    static setRouter(pathStr){
+    static distribute(pathStr){
         return async (ctx,next)=>{
             Controller.autoMatch(ctx,pathStr)
             await next();
@@ -65,6 +73,7 @@ module.exports = class Controller{
         const options=this.options;
         return async (ctx,next)=>{
             const modules=await this[parseModules](options.appPath).catch(err=>{throw err});
+            console.log(modules)
             await next();
             if(options.auto)Controller.autoMatch(ctx);
             if(!ctx.module)ctx.module=options.module;
@@ -107,42 +116,53 @@ module.exports = class Controller{
     /**
      * 获取模块下所有类的引用
      */
-    async [parseModules](appPath,controllerName) {
-        if (!controllerName){
+    async [parseModules](appPath,moduleName) {
+        if (!moduleName){
             if (!h.isExist(appPath)) return Promise.resolve({});
             let res = await h.readdir(appPath, false).catch(err => {throw err})
             if (!res.dir) {
                 return Promise.resolve({});
             }
-            controllerName=res.dir;
+            moduleName=res.dir;
         }
         let p = [], dirs = [];
-        if (Array.isArray(controllerName)){
-            controllerName.forEach(dir => {
+        let excludeModule = this.options.excludeModule;
+        if (Array.isArray(moduleName)){
+            moduleName = moduleName.filter(item=>{
+                return excludeModule.indexOf(item.toLowerCase()) === -1;
+            })
+            moduleName.forEach(dir => {
                 dirs.push(dir);
                 p.push(h.readdir(path.join(appPath, dir), false));
             })
+        } else if (excludeModule.indexOf(moduleName)>=0){
+            return Promise.resolve({});
         }else{
-            dirs = [controllerName];
-            p=[h.readdir(path.join(appPath, controllerName), false)];
+            dirs = [moduleName];
+            p=[h.readdir(path.join(appPath, moduleName), false)];
         }
+        
         
         let files = {},
             res = await Promise.all(p).catch(err => {});
-            res.forEach((v, i) => {
-                if(v.dir){
-                    this.parseModules(v.filePath,v.dir)
-                }
-                if (v.file) {
-                    let item = {};
-                    
+        let excludeController = this.options.excludeController;
+        res.forEach((v, i) => {
+            // if(v.dir){
+            //     this[parseModules](v.filePath,v.dir)
+            // }
+            if (v.file) {
+                let item = {};
                 v.file.forEach(f => {
-                    let extname=path.extname(f);
+                    let extname=path.extname(f),
+                        controllerName = path.basename(f, extname);
+                    if (excludeController.indexOf(controllerName.toLowerCase()) >=0){
+                        return;
+                    }
                     if(extname!=='.js')return;
                     let Controller=require(path.resolve(v.filePath, f));
                     if(typeof Controller!=='function')return;
-                    item[path.basename(f, extname)] = Controller;
-                    // item[path.basename(f, extname)] = path.join(v.filePath, f);
+                    item[controllerName] = Controller;
+                    // item[controllerName] = path.join(v.filePath, f);
                 })
                 files[dirs[i]] = item;
             }
