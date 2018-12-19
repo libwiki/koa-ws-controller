@@ -16,5 +16,5 @@ app.use(new Controller({
 // 当然如果模块目录中未匹配到的路由也可以额外的匹配
 const router=require('koa-router')()
 app.use(router.routes()).use(router.allowedMethods())
-router.get('/aaa/bbb',Controller.setRouter('home/user'))
+router.get('/aaa/bbb',Controller.distribute('home/user'))
 app.listen(3030)

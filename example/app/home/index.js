@@ -7,11 +7,11 @@ module.exports=class{
     }
     async index(ctx){
         console.log('home/index/index.html')
+        this.myfun();
         ctx.body={
             path:this.path(),
             isPost:this.isPost(),
-            method: ctx.method,
-            imethod: ctx.method.toUpperCase() === 'POST',
+            myfun: this.myfun,
             url0:this.url(),
             url1:this.url('index'),
             url2:this.url('index',{name:'joy',age:18}),
