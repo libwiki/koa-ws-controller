@@ -1,6 +1,6 @@
 {
   "name": "koa-ws-controller",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "koa-controller",
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,9 @@
     "ws-helpers": "^1.0.0"
   },
   "devDependencies": {
+    "art-template": "^4.13.2",
     "koa": "^2.6.2",
+    "koa-art-template": "^1.1.1",
     "koa-router": "^7.4.0"
   },
   "keywords": [

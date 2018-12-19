@@ -1,10 +1,16 @@
 module.exports=class{
     constructor(ctx){
-        console.ctx
+        ctx.state.url=this.url
+    }
+    async test(ctx) {
+        console.log(this.path())
+        ctx.render(this.path())
+        return false
     }
     async __before(ctx){
         console.log('__before')
     }
+    
     async index(ctx){
         console.log('home/index/index.html')
         this.myfun();

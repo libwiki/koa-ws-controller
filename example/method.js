@@ -2,6 +2,7 @@ const Koa=require('koa')
 const path=require('path')
 const router=require('koa-router')()
 const Controller=require('../index')
+const render = require('koa-art-template')
 const app=new Koa();
 app.use(Controller.sliceSuffix()) //去掉 ctx.path的伪静态后缀(必选并且该中间件应该在路由匹配之前)（例：/a/b.html）
 app.use(router.routes()).use(router.allowedMethods())
@@ -15,6 +16,7 @@ app.use(new Controller({
     action:'index' //默认方法 默认值：index
 
 }))
+
 // 如果需要控制对应的请求方法或者路径变换可结合 koa-router等路由中间件实现
 
 // 1）、get分配
@@ -25,4 +27,12 @@ router.post('/home/index', Controller.distribute())
 // 3）、改变路由
 router.get('/aaa/bbb', Controller.distribute('home/user'))
 
+
+// 
+router.get('/home/index/test', Controller.distribute())
+render(app, {
+    root: path.join(__dirname, "/views"),
+    extname: ".html",
+    debug: process.env.NODE_ENV !== 'production'
+})
 app.listen(3030)

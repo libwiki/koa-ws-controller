@@ -3,7 +3,7 @@ const path = require('path')
 module.exports=ctx=>{
     return {
         url(url='', query={}, suffix = '.html',domain=false) {
-            url = this.path(url||'');
+            url = '/' + pathBuild(ctx,url || '');
             if (toString.call(query) === '[object Object]'){
                 query = qs.stringify(query)
             }
@@ -25,26 +25,30 @@ module.exports=ctx=>{
         isPost(){
             return ctx.method.toUpperCase()==='POST';
         },
-        // /home/index/index
+        // home/index/index
         path(url){
-            let sep='/';
-            if(url&&typeof url==='string'){
-                let start = url.indexOf(sep)===0?1:0;
-                urlArr = url.split(sep).slice(start,start+3);
-                switch(urlArr.length){
-                    case 0:
-                        urlArr = [ctx.module, ctx.controller, ctx.action];
-                        break;
-                    case 1:
-                        urlArr.unshift(ctx.module, ctx.controller);
-                        break;
-                    case 2:
-                        urlArr.unshift(ctx.module);
-                        break;
-                }
-                return sep + urlArr.join(sep)
-            }
-            return sep + ctx.module + sep + ctx.controller + sep+ctx.action;
+            return pathBuild(ctx,url);
         }
     }
+}
+
+function pathBuild(ctx, url) {
+    let sep = '/';
+    if (url && typeof url === 'string') {
+        let start = url.indexOf(sep) === 0 ? 1 : 0;
+        urlArr = url.split(sep).slice(start, start + 3);
+        switch (urlArr.length) {
+            case 0:
+                urlArr = [ctx.module, ctx.controller, ctx.action];
+                break;
+            case 1:
+                urlArr.unshift(ctx.module, ctx.controller);
+                break;
+            case 2:
+                urlArr.unshift(ctx.module);
+                break;
+        }
+        return urlArr.join(sep)
+    }
+    return ctx.module + sep + ctx.controller + sep + ctx.action;
 }
